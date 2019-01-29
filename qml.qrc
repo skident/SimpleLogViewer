@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>LogContentView.qml</file>
+        <file>resources/close.png</file>
+        <file>main.qml</file>
+        <file>FilteringPanel.qml</file>
+        <file>PopupWindow.qml</file>
+        <file>ContextMenu.qml</file>
+        <file>ContextItem.qml</file>
+        <file>SaveFileDialog.qml</file>
+    </qresource>
+</RCC>

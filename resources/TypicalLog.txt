@@ -1,0 +1,2 @@
+[2019.01.29 10:31:36.222] [Thread ID=22222] [INFO] start logging
+[2019.01.29 10:31:37.111] [Thread ID=22222] [ERROR] stop logging

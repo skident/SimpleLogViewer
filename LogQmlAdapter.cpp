@@ -1,0 +1,2 @@
+#include "LogQmlAdapter.h"
+
