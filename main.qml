@@ -35,7 +35,7 @@ ApplicationWindow {
         id: saveFileDialog
 
         onAccepted: {
-//            console.log("You chose: " + saveFileDialog.currentFile)
+            //            console.log("You chose: " + saveFileDialog.currentFile)
             MainController.saveToFile(saveFileDialog.currentFile);
         }
     }
@@ -78,6 +78,43 @@ ApplicationWindow {
             MenuItem { text: "Paste" }
         }
     }
+
+
+
+    ///////////
+
+    DropArea {
+        id: drop
+        anchors.fill: parent
+
+        enabled: true
+
+        onEntered: {
+            // Make some validations of dragged files
+            if (drag.urls.length > 1) {
+                console.warn("Only one file will be loaded");
+            }
+        }
+
+        onExited: {
+            console.log("exited")
+        }
+
+        onDropped: {
+            console.log("dropped")
+
+            for(var i = 0; i < drop.urls.length; i++) {
+                console.log(drop.urls[i]);
+            }
+
+            // TODO: ask to save previous log file
+            MainController.closeCurrent();
+            MainController.openFile(drop.urls[0]);
+        }
+    }
+
+    ///////////
+
 
 
     Rectangle {

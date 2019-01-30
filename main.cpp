@@ -15,7 +15,7 @@
  * 4. Support any type of log with adding regex for parsing it
  * 5. Save to file processed log                                - DONE: preliminary
  * 6. Serialize/Deserialize project to/from file
- * 7. Drag&Drop new log file into a window
+ * 7. Drag&Drop new log file into a window                      - DONE: preliminary
 */
 
 int main(int argc, char *argv[])
