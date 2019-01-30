@@ -8,8 +8,14 @@ Item {
 
     function positionViewAtRow(row) {
         tableView.positionViewAtRow(row);
+    }
+
+    function clearHighlights() {
         tableView.selection.clear();
-        tableView.selection.select(row);
+    }
+
+    function highlightRow(id) {
+        tableView.selection.select(id);
     }
 
     Item {

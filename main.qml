@@ -1,11 +1,9 @@
 import QtQuick 2.9
 import QtQuick.Window 2.2
-import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs 1.0
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
-
-//import Qt.labs.platform 1.0
 
 import "."
 
@@ -16,6 +14,16 @@ ApplicationWindow {
     width: 640
     height: 480
     title: qsTr("Simple log viewer")
+
+    readonly property var foundIds: LogQmlAdapter.foundIds
+
+    onFoundIdsChanged: {
+        console.log("found list changed")
+        logContentView.clearHighlights();
+        for (var i = 0; i < foundIds.length; i++) {
+            logContentView.highlightRow(foundIds[i]);
+        }
+    }
 
     function positionViewAtRow(idx) {
         logContentView.positionViewAtRow(idx);
@@ -136,6 +144,13 @@ ApplicationWindow {
                     if (idx >= 0) {
                         root.positionViewAtRow(idx);
                     }
+                }
+            }
+
+            Button {
+                text: "clear"
+                onClicked: {
+                    LogQmlAdapter.resetSearch();
                 }
             }
         }

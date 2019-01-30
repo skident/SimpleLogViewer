@@ -66,8 +66,9 @@ class LogQmlAdapter : public QObject
 
     Q_PROPERTY(QVariantList info READ info NOTIFY changed)
     Q_PROPERTY(QVariantList pinnedInfo READ pinnedInfo NOTIFY changed)
-    //    Q_PROPERTY(QVariantMap threads READ threads NOTIFY changed)
     Q_PROPERTY(QStringList filters READ filters NOTIFY changed)
+
+    Q_PROPERTY(QList<int> foundIds READ foundIds NOTIFY searchResultsChanged)
 
 public:
     QVariantList info() const
@@ -82,6 +83,7 @@ public:
 
     void init(const std::list<LogInfo>& info)
     {
+        resetSession();
         m_origInfo = info;
         show();
     }
@@ -152,21 +154,47 @@ public:
     {
         auto logs = FilterProcessor::filter(m_filters, m_origInfo);
         int idx = 0;
+        int firstIdx = -1;
 
         const std::string request = searchRequest.toStdString();
         for (const auto& elem : logs)
         {
             if (elem.contains(request))
             {
-                return idx;
+                if (firstIdx == -1)
+                {
+                    firstIdx = idx;
+                }
+                m_foundIds.append(idx);
             }
             idx++;
         }
-        return -1;
+        emit searchResultsChanged();
+        return firstIdx;
+    }
+
+    QList<int> foundIds() const
+    {
+        return m_foundIds;
+    }
+
+
+    Q_INVOKABLE void resetSearch()
+    {
+        m_foundIds.clear();
+        emit searchResultsChanged();
+    }
+
+private:
+    void resetSession()
+    {
+        clearFilters();
+        resetSearch();
     }
 
 signals:
     void changed();
+    void searchResultsChanged();
 
 private:
     std::set<Filter> m_filters;
@@ -175,6 +203,8 @@ private:
 
     QVariantList m_info;
     QVariantList m_pinnedInfo;
+
+    QList<int> m_foundIds;
 
     //    QVariantMap m_threads;
 };

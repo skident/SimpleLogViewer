@@ -3,7 +3,13 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
 Rectangle {
+    id: root
+
     readonly property int minimalWidth: filterColumn.childrenRect.width
+
+    function applyFilter(fieldName, comparisonType, value) {
+        LogQmlAdapter.applyFilter(fieldName, comparisonType, value);
+    }
 
     Column {
         anchors.fill: parent
@@ -12,7 +18,6 @@ Rectangle {
             width: 1
             height: 20
         }
-
 
         Column {
             id: filterColumn
@@ -35,23 +40,22 @@ Rectangle {
             TextField {
                 id: value
 
-//                style: TextFieldStyle {
-//                    textColor: "black"
-//                    background: Rectangle {
-//                        radius: 2
-//                        implicitWidth: 150
-//                        implicitHeight: 24
-//                        border.color: "#333"
-//                        border.width: 1
-//                    }
-//                }
+                placeholderText: "enter your text"
+
+                Keys.onReturnPressed: {
+                    root.applyFilter(field.currentText, comparison.currentText, value.text);
+                    value.text = ""
+                }
             }
 
 
             Button {
+                id: addFilterButton
                 text: "ADD"
                 onClicked: {
-                    LogQmlAdapter.applyFilter(field.currentText, comparison.currentText, value.text);
+                    root.applyFilter(field.currentText, comparison.currentText, value.text);
+                    value.text = ""
+//                    LogQmlAdapter.applyFilter(field.currentText, comparison.currentText, value.text);
                 }
             }
         }
