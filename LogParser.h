@@ -202,17 +202,29 @@ class LogParser
 public:
     std::list<LogInfo> infoList;
 
+private:
+    static void eraseSubStr(std::string & mainStr, const std::string & toErase)
+    {
+        // Search for the substring in string
+        size_t pos = mainStr.find(toErase);
+
+        if (pos != std::string::npos)
+        {
+            // If found then erase it from string
+            mainStr.erase(pos, toErase.length());
+        }
+    }
 
 public:
     LogParser();
 
-    void open(const std::string& filename)
+    bool open(const std::string& filename)
     {
         std::ifstream file(filename);
         if (!file.is_open())
         {
             std::cerr << "File wasn't opened" << filename << std::endl;
-            return;
+            return false;
         }
 
         std::string line;
@@ -226,6 +238,7 @@ public:
             }
             infoList.emplace_back(std::move(info));
         }
+        return true;
     }
 
     static void parse(const std::list<std::string>& lines, std::list<LogInfo>& outInfoList)
@@ -243,25 +256,32 @@ public:
         }
     }
 
-    static LogInfo parseLine(const std::string& subject)
+    static LogInfo parseLine(std::string subject)
     {
         LogInfo result;
         try {
-            const std::string threadIdChunk = "Thread ID=";
-            std::regex re("(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}) (\\(.*\\)) (\\[DEBUG\\]|\\[ERROR\\]|\\[WARNING\\]|\\[INFO\\]) (.*)");
+            {
+                const std::string threadIdChunk = "Thread ID=";
+                eraseSubStr(subject, threadIdChunk);
+            }
+
+            std::string raw_regex = R"((\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \(?(\d{1,})\)? \[?(DEBUG|ERROR|WARNING|INFO)\]? (.*))";
+            std::regex re(raw_regex);
             std::smatch match;
+
             if (std::regex_search(subject, match, re) && match.size() >= 4)
             {
                 result.timestamp = match.str(1);
 
                 std::string tmp = match.str(2);
-                auto pos = tmp.find(threadIdChunk)+threadIdChunk.size();
-                tmp = tmp.substr(pos);
-                tmp = tmp.substr(0, tmp.size()-1);
+                result.thread_info = tmp;
 
-                result.thread_info = tmp; // match.str(2).substr(1, match.str(2).size()-2);
-
-                result.severity = match.str(3).substr(1, match.str(3).size()-2);
+                tmp = match.str(3);
+                if (tmp.find("[") == 0)
+                {
+                    tmp = tmp.substr(1, match.str(3).size()-2);
+                }
+                result.severity = tmp;
 
                 result.message = match.str(4);
             }

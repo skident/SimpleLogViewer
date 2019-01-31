@@ -29,6 +29,11 @@ ApplicationWindow {
         logContentView.positionViewAtRow(idx);
     }
 
+    function percents(totalWidth, percents) {
+        return totalWidth * (percents / 100);
+    }
+
+
     FileDialog {
         id: fileDialog
         title: "Please choose a file"
@@ -91,6 +96,15 @@ ApplicationWindow {
 
     ///////////
 
+    DropAreaTile {
+        id: dropAreaTile
+        anchors.fill: parent
+
+        z: parent.z + 100
+
+        visible: false
+    }
+
     DropArea {
         id: drop
         anchors.fill: parent
@@ -98,6 +112,7 @@ ApplicationWindow {
         enabled: true
 
         onEntered: {
+            dropAreaTile.visible = true;
             // Make some validations of dragged files
             if (drag.urls.length > 1) {
                 console.warn("Only one file will be loaded");
@@ -105,11 +120,13 @@ ApplicationWindow {
         }
 
         onExited: {
+            dropAreaTile.visible = false;
             console.log("exited")
         }
 
         onDropped: {
             console.log("dropped")
+            dropAreaTile.text = "Processing the file"
 
             for(var i = 0; i < drop.urls.length; i++) {
                 console.log(drop.urls[i]);
@@ -117,7 +134,15 @@ ApplicationWindow {
 
             // TODO: ask to save previous log file
             MainController.closeCurrent();
-            MainController.openFile(drop.urls[0]);
+            var res = MainController.openFile(drop.urls[0]);
+//            if (res) {
+//                dropAreaTile.text = "Loaded successfully!"
+//            } else {
+//                dropAreaTile.text = "Something went wrong!"
+////                dropAreaTile.buttonVisibility = true;
+//            }
+            dropAreaTile.visible = false;
+            dropAreaTile.text = "Drop your file"
         }
     }
 
@@ -135,12 +160,20 @@ ApplicationWindow {
         Row {
             TextField {
                 id: search
+
+                Keys.onReturnPressed: {
+                    var idx = LogQmlAdapter.findAllElements(search.text);
+                    if (idx >= 0) {
+                        root.positionViewAtRow(idx);
+                    }
+                    search.text = ""
+                }
             }
 
             Button {
                 text: "find"
                 onClicked: {
-                    var idx = LogQmlAdapter.findElement(search.text);
+                    var idx = LogQmlAdapter.findAllElements(search.text);
                     if (idx >= 0) {
                         root.positionViewAtRow(idx);
                     }
@@ -169,17 +202,16 @@ ApplicationWindow {
 
         LogContentView {
             id: logContentView
-            width: parent.width / 3 * 2
+            width: root.percents(parent.width, 80)
         }
-
 
         FilteringPanel {
             id: filteringPanel
 
             Layout.minimumWidth: minimalWidth
 
-            width: parent.width / 3
-            color: "lightgreen"
+            width: root.percents(parent.width, 20)
+            color: "#e6e2d3"
         }
     }
 

@@ -150,7 +150,7 @@ public:
         show();
     }
 
-    Q_INVOKABLE int findElement(const QString& searchRequest)
+    Q_INVOKABLE int findAllElements(const QString& searchRequest)
     {
         auto logs = FilterProcessor::filter(m_filters, m_origInfo);
         int idx = 0;
