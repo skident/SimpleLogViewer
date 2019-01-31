@@ -8,5 +8,6 @@
         <file>ContextMenu.qml</file>
         <file>ContextItem.qml</file>
         <file>SaveFileDialog.qml</file>
+        <file>DropAreaTile.qml</file>
     </qresource>
 </RCC>
